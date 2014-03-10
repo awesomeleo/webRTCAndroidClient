@@ -1,10 +1,4 @@
-webRTCAndroidClient
-===================
-
-This is a simplified version of AppRTC (without Audio or Video, but with messages through Data Channels)
-that in turn uses web sockets as the signaling mechanism. It has a very tiny server made with Node.js.
-
-As said previously, this is a variation of AppRTC, the sample application from the maintainers of WebRTC.
+This is a variation of AppRTC, the sample application from the maintainers of WebRTC.
 This app has been modified to just send messages peer to peer using Web RTC data channels,
 without using https://apprtc.appspot.com and Google App Engine channels as signaling mechanism.
 

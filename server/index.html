@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="keywords" content="WebRTC, HTML5, JavaScript" />
+<meta name="description" content="WebRTC Reference App" />
+<meta name="viewport"
+    content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+<title>WebRTC client</title>
+
+<script src='http://192.168.1.6:2013/socket.io/socket.io.js'></script>
+
+</head>
+
+<body onbeforeunload="closeSocket()">
+    <script type="text/javascript">
+        var isInitiator = false;
+
+        // room = prompt("Enter room name:");
+        room = "defaultRoom";
+
+        var socket = io.connect();
+
+        if (room !== "") {
+            console.log('Joining room ' + room);
+            socket.emit('create or join', room);
+        }
+
+        socket.on('created', function(room) {
+            console.log('Created room ' + room);
+            console.log('You are the initiator!');
+            isInitiator = true;
+            androidMessageHandler.whenIJoinTheRoomCreatedByMe(isInitiator);
+        });
+
+        // sent to those already inside the room
+        socket.on('join', function(room) {
+            console.log('Another peer made a request to join room ' + room);
+            androidMessageHandler.whenAnotherPartyJoinedMyRoom(isInitiator);
+        });
+
+        // sent to the newly joined participant
+        socket.on('joined', function(room) {
+            console.log('This peer has joined room ' + room);
+            androidMessageHandler.whenIJoinedARoomCreatedByAnotherParty(isInitiator);
+        });
+
+        socket.on('full', function(room) {
+            console.log('Room ' + room + ' is full');
+            androidMessageHandler.onError();
+        });
+
+        socket.on('log', function(array) {
+            console.log.apply(console, array);
+        });
+
+        socket.on('message', function(message) {
+            console.log('Client received message:', message);
+            androidMessageHandler.onMessage(message);
+        });
+
+        function sendMessage(message) {
+            console.log('Client sending message: ', message);
+            // if (typeof message === 'object') {
+            // message = JSON.stringify(message);
+            // }
+            socket.emit('message', message);
+        }
+
+        function closeSocket() {
+            socket.emit('disconnect');
+        }
+    </script>
+</body>
+</html>
